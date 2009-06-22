@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.5
+#!/usr/bin/env python
 
 """
 parses djbdns log files
@@ -17,7 +17,7 @@ line[52:]      # name
 import tai64
 
 def _hex2int(h):
-    """ returns decimal looking string from hex looking string
+    """ returns integer from hex string
     
     Example
         >>> _hex2int("a3")
@@ -25,7 +25,7 @@ def _hex2int(h):
     """
     return int(h, 16)
 
-def translate_ip(ip_hex):
+def _translate_ip(ip_hex):
     """ returns a tuple of integers from a 8 char hex string.
     
     Example
@@ -35,13 +35,13 @@ def translate_ip(ip_hex):
     ip = (ip_hex[0:2], ip_hex[2:4], ip_hex[4:6], ip_hex[6:8])
     return tuple(map(lambda x:int(x,16), ip))
 
-code_lookup = {"+": "response",
+_code_lookup = {"+": "response",
                "-": "dropped",
                "I": "not implemented",
                "C": 'not "IN" class',
                "/": "defect/dropped"}
 
-type_lookup = {"0001":  "A",
+_type_lookup = {"0001":  "A",
                "0002": 	"NS",
                "0005": 	"CNAME",
                "0006": 	"SOA",
@@ -54,7 +54,13 @@ type_lookup = {"0001":  "A",
                "00fc": 	"AXFR",
                "00ff": 	"wildcard"}
 
-def parse_line(line):
+
+def __metacall(clble, arg):
+    if isinstance(clble, dict):
+        return clble.get(arg, "UNKNOWN")
+    return clble(arg)
+
+def parse_line(line, t64n=tai64.decode_tai64n):
     """ returns tuple of entries from log line
     
     Example
@@ -62,15 +68,15 @@ def parse_line(line):
         (datetime.datetime(2009, 6, 12, 11, 16, 25), (163, 28, 113, 16), 42714, '0795', 'response', 'MX ', 'leela.toppoint.de')
     """
     if line.startswith("@"):
-        date = tai64.tai2utc(tai64.decode_tai64n(line[1:25]))
+        date = t64n(line[1:25])
     else:
         date = None
     return (date,
-            translate_ip(line[26:34]),  # IP Address
+            _translate_ip(line[26:34]),  # IP Address
             _hex2int(line[35:39]),      # PORT
             line[40:44],                # ID
-            code_lookup[line[45]],      # code
-            type_lookup[line[47:51]],   # type
+            _code_lookup.get(line[45], "UNKNOWN"),      # code
+            _type_lookup.get(line[47:51], "UNKNOWN"),   # type
             line[52:-1])                  # name
 
 
@@ -79,7 +85,6 @@ def parse_file(filename):
     """
     for line in open(filename).readlines():
         yield parse_line(line)
-            
 
 
 if __name__ == '__main__':
