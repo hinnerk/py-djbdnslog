@@ -42,7 +42,9 @@ __code_lookup = {"+": "response",
                "C": 'not "IN" class',
                "/": "defect/dropped"}
 
-__type_lookup = {"0001":  "A",
+__type_lookup = {   # see here for more:
+                    # http://www.iana.org/assignments/dns-parameters
+               "0001":  "A",
                "0002": 	"NS",
                "0005": 	"CNAME",
                "0006": 	"SOA",
@@ -53,7 +55,7 @@ __type_lookup = {"0001":  "A",
                "0026": 	"A6 ",
                "00fb": 	"IXFR",
                "00fc": 	"AXFR",
-               "00ff": 	"wildcard"}
+               "00ff": 	"*"}
 
 
 def __metacall(clble, arg):
@@ -104,11 +106,11 @@ def parse_line(line, t64n=tai64n.decode_tai64n,
     else:
         date = None
     return (date,
-            _translate_ip(line[26:34]),  # IP Address
-            _hex2int(line[35:39]),      # PORT
+            translate_ip(line[26:34]),  # IP Address
+            hex2int(line[35:39]),      # PORT
             line[40:44],                # ID
-            _code_lookup.get(line[45], "UNKNOWN"),      # code
-            _type_lookup.get(line[47:51], "UNKNOWN"),   # type
+            code_dict.get(line[45], "UNKNOWN"),      # code
+            type_dict.get(line[47:51], "UNKNOWN"),   # type
             line[52:-1])                  # name
 
 

@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name = "djbdnslog",
-    version = "0.2.1",
+    version = "0.2.3",
     url = 'http://bitbucket.org/hinnerk/py-djbdnslog/',
     license = 'BSD',
     description = "Parses djbdns log files and returns native python data types.",
@@ -15,9 +15,17 @@ setup(
     author = 'Hinnerk Haardt',
     author_email = 'hinnerk@randnotizen.de',
 
-    packages = find_packages('src'),
     package_dir = {'': 'src'},
-    scripts = ['scripts/stats.py'],
+    packages = ['djbdnslog'],
+    
+    entry_points = {
+        "console_scripts": [
+            'stats = djbdnslog.scripts.stats:main',
+            'convert = djbdnslog.scripts.convert:main',
+        ]
+    },
+    
+    #scripts = ['src/bin/stats.py', 'src/bin/convert.py'],
     install_requires = ['setuptools', 'tai64n'],
 
     classifiers = [
