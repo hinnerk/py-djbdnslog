@@ -25,15 +25,15 @@ setup(
         ]
     },
     
-    #scripts = ['src/bin/stats.py', 'src/bin/convert.py'],
     install_requires = ['setuptools', 'tai64n'],
 
     classifiers = [
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Topic :: Other/Nonlisted Topic',
+        'Topic :: System :: Logging',
     ],
 )
