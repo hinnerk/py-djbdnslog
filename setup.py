@@ -6,18 +6,18 @@ def read(fname):
 
 setup(
     name = "djbdnslog",
-    version = "0.2",
+    version = "0.2.1",
     url = 'http://bitbucket.org/hinnerk/py-djbdnslog/',
     license = 'BSD',
     description = "Parses djbdns log files and returns native python data types.",
-    long_description = read('README.rst'),
+    long_description = read('README'),
 
     author = 'Hinnerk Haardt',
     author_email = 'hinnerk@randnotizen.de',
 
-    packages = find_packages('djbdnslog'),
-    package_dir = {'': 'djbdnslog'},
-    
+    packages = find_packages('src'),
+    package_dir = {'': 'src'},
+    scripts = ['scripts/stats.py'],
     install_requires = ['setuptools', 'tai64n'],
 
     classifiers = [
@@ -27,5 +27,5 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Other/Nonlisted Topic',
-    ]
+    ],
 )
