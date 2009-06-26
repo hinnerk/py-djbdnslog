@@ -17,6 +17,10 @@ simple_statistics(filename)
 
 import tai64n
 
+class DJBDNSlogDecodeError(Exception):
+    pass
+
+
 def __hex2int(h):
     """ returns integer from hex string
     
@@ -26,15 +30,27 @@ def __hex2int(h):
     """
     return int(h, 16)
 
-def __translate_ip(ip_hex):
-    """ returns a tuple of integers from a 8 char hex string.
+
+def __translate_ip(ip):
+    """ returns a tuple of integers from a 8 or 32 char hex string.
+
+    Args
+        ip: string, hex-encoded IPv4 or IPv6 address
+
+    Returns
+        a tuple containing either 4 or 8 integers
     
-    Example
+    Examples
         >>> __translate_ip("a31c7110")
         (163, 28, 113, 16)
+        >>> __translate_ip("7f000001")
+        (127, 0, 0, 1)
+        >>> __translate_ip("00000000000000000000ffff7f000001")
+        (0, 0, 0, 0, 0, 65535, 32512, 1)
     """
-    ip = (ip_hex[0:2], ip_hex[2:4], ip_hex[4:6], ip_hex[6:8])
-    return tuple(map(lambda x:int(x,16), ip))
+    l = max((2, len(ip) / 8))                       # 2 for IPv4, 4 for IPv6
+    ip_hex = (ip[l*i:l*i+l] for i in xrange(l*2))   # split in l-length strings
+    return tuple(map(lambda x:int(x,16), ip_hex))   # return tuple containing int
 
 __code_lookup = {"+": "response",
                "-": "dropped",
@@ -57,11 +73,6 @@ __type_lookup = {   # see here for more:
                "00fc": 	"AXFR",
                "00ff": 	"*"}
 
-
-def __metacall(clble, arg):
-    if isinstance(clble, dict):
-        return clble.get(arg, "UNKNOWN")
-    return clble(arg)
 
 def parse_line(line, t64n=tai64n.decode_tai64n,
                      translate_ip=__translate_ip,
@@ -100,18 +111,21 @@ def parse_line(line, t64n=tai64n.decode_tai64n,
     # line[45]       # code
     # line[47:51]    # type
     # line[52:]      # name
-    
-    if line.startswith("@"):
-        date = t64n(line[1:25])
-    else:
-        date = None
-    return (date,
-            translate_ip(line[26:34]),  # IP Address
-            hex2int(line[35:39]),      # PORT
-            line[40:44],                # ID
-            code_dict.get(line[45], "UNKNOWN"),      # code
-            type_dict.get(line[47:51], "UNKNOWN"),   # type
-            line[52:])                  # name
+    try:
+        date, stuff, code, type, name = line.split()
+    except ValueError:
+        try:
+            # possibly no date given?
+            stuff, code, type, name = line.split()
+            date = None
+        except:
+            raise DJBDNSlogDecodeError("Can't decode Entry: '%s'" % line)
+    ip, port, id = stuff.split(":")
+    if date: # and date.startswith("@"):
+        date.strip("@")
+        date = t64n(date[1:])
+    return (date, translate_ip(ip), hex2int(port), id, code_dict.get(code, "UNKNOWN"),
+            type_dict.get(type, "UNKNOWN"), name)
 
 
 def parse_file(filename):
