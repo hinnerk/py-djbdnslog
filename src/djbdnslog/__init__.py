@@ -21,7 +21,7 @@ def __hex2int(h):
     """ returns integer from hex string
     
     Example
-        >>> _hex2int("a3")
+        >>> __hex2int("a3")
         163
     """
     return int(h, 16)
@@ -30,7 +30,7 @@ def __translate_ip(ip_hex):
     """ returns a tuple of integers from a 8 char hex string.
     
     Example
-        >>> translate_ip("a31c7110")
+        >>> __translate_ip("a31c7110")
         (163, 28, 113, 16)
     """
     ip = (ip_hex[0:2], ip_hex[2:4], ip_hex[4:6], ip_hex[6:8])
@@ -91,7 +91,7 @@ def parse_line(line, t64n=tai64n.decode_tai64n,
         
     Example
         >>> parse_line("@400000004a32392b2aa21dac a31c7110:a6da:0795 + 000f leela.toppoint.de")
-        (datetime.datetime(2009, 6, 12, 11, 16, 25), (163, 28, 113, 16), 42714, '0795', 'response', 'MX ', 'leela.toppoint.de')
+        (datetime.datetime(2009, 6, 12, 11, 16, 25, 715267), (163, 28, 113, 16), 42714, '0795', 'response', 'MX ', 'leela.toppoint.de')
     """
     # line[1:26]     # date
     # line[26:34]    # IP Address
@@ -111,7 +111,7 @@ def parse_line(line, t64n=tai64n.decode_tai64n,
             line[40:44],                # ID
             code_dict.get(line[45], "UNKNOWN"),      # code
             type_dict.get(line[47:51], "UNKNOWN"),   # type
-            line[52:-1])                  # name
+            line[52:])                  # name
 
 
 def parse_file(filename):
