@@ -39,7 +39,7 @@ This software has two faces:
 1. Using the Scripts without system-wide installation
 *****************************************************
 
-I included a buildout setup to contain everything into one directory. Make sure you have python installed (installed by default on recent operating systems like FreeBSD, Linux, Mac OS X or OpenSolaris). Clone `the mercurial repository`__ or `download an archive`__. Then run::
+I included a buildout setup to contain everything into one directory. Make sure you have python installed (installed by default on recent operating systems like FreeBSD, Linux, Mac OS X or OpenSolaris). Clone `the mercurial repository`__ or `download the .zip archive`__. Then run::
 
     python ./bootstrap.py
     ./bin/buildout
@@ -47,7 +47,7 @@ I included a buildout setup to contain everything into one directory. Make sure 
 If everything went fine you should find the scripts in ``./bin`` (try ``./bin/convert <yourlogfile.log>`` to see a human readable dump of your log file).
 
 __ http://bitbucket.org/hinnerk/py-djbdnslog/
-__ http://bitbucket.org/hinnerk/py-djbdnslog/downloads/
+__ http://bitbucket.org/hinnerk/py-djbdnslog/get/tip.zip
 
 
 2. Installing the Python Module

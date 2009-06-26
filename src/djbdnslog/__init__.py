@@ -32,25 +32,29 @@ def __hex2int(h):
 
 
 def __translate_ip(ip):
-    """ returns a tuple of integers from a 8 or 32 char hex string.
+    """ returns a formatted string from a 8 or 32 char hex string.
 
     Args
         ip: string, hex-encoded IPv4 or IPv6 address
 
     Returns
-        a tuple containing either 4 or 8 integers
+        a standard formatted string
     
     Examples
-        >>> __translate_ip("a31c7110")
-        (163, 28, 113, 16)
+        >>> __translate_ip("c0a80bff")
+        '192.168.11.255'
         >>> __translate_ip("7f000001")
-        (127, 0, 0, 1)
+        '127.0.0.1'
         >>> __translate_ip("00000000000000000000ffff7f000001")
-        (0, 0, 0, 0, 0, 65535, 32512, 1)
+        '0000:0000:0000:0000:0000:ffff:7f00:0001'
     """
-    l = max((2, len(ip) / 8))                       # 2 for IPv4, 4 for IPv6
-    ip_hex = (ip[l*i:l*i+l] for i in xrange(l*2))   # split in l-length strings
-    return tuple(map(lambda x:int(x,16), ip_hex))   # return tuple containing int
+    if len(ip) == 8:        # IPv4
+        ip_hex = (ip[2*i:2*i+2] for i in xrange(4))
+        return ".".join(map(lambda x:str(int(x,16)), ip_hex))
+    elif len(ip) == 32:     # IPv6
+        return ":".join(ip[4*i:4*i+4] for i in xrange(8))
+    else:
+        raise DJBDNSlogDecodeError("'%s' is no valid IPv4 or IPv6 address." % ip)
 
 __code_lookup = {"+": "response",
                "-": "dropped",
@@ -92,8 +96,8 @@ def parse_line(line, t64n=tai64n.decode_tai64n,
     Returns
         A tuple containing the decoded data. Decoding depends on the
         given decoders, the default ones are:
-            timestamp   => datetime.datetime
-            IPv4        => (int, int, int, int)
+            timestamp   => datetime.datetime or None
+            IPv4/6      => string
             PORT        => int
             ID          => string
             CODE        => dict lookup (see module source, __code_lookup)
@@ -101,8 +105,8 @@ def parse_line(line, t64n=tai64n.decode_tai64n,
             NAME        => string
         
     Example
-        >>> parse_line("@400000004a32392b2aa21dac a31c7110:a6da:0795 + 000f leela.toppoint.de")
-        (datetime.datetime(2009, 6, 12, 11, 16, 25, 715267), (163, 28, 113, 16), 42714, '0795', 'response', 'MX ', 'leela.toppoint.de')
+        >>> parse_line("@400000004a32392b2aa21dac c0a80bff:a6da:0795 + 000f leela.toppoint.de")
+        (datetime.datetime(2009, 6, 12, 11, 16, 25, 715267), '192.168.11.255', 42714, '0795', 'response', 'MX ', 'leela.toppoint.de')
     """
     # line[1:26]     # date
     # line[26:34]    # IP Address
