@@ -2,3 +2,4 @@ bin
 develop-eggs
 src/djbdnslog.egg-info
 dist
+.installed.cfg
