@@ -10,7 +10,7 @@ setup(
     url = 'http://bitbucket.org/hinnerk/py-djbdnslog/',
     license = 'BSD',
     description = "Parses djbdns log files and returns native python data types.",
-    long_description = read('README'),
+    long_description = read('README.md'),
 
     author = 'Hinnerk Haardt',
     author_email = 'hinnerk@randnotizen.de',
